@@ -1,0 +1,177 @@
+x = inputData;
+
+y = targetData;
+
+test= SimulationInputData;
+
+
+% Create a Fitting Network
+
+hiddenLayerSize = 10;
+
+net = fitnet(hiddenLayerSize,trainFcn);
+
+
+%Define training functions and transfer function
+
+transferFcn = 'logsig'; 
+
+trainFcn = 'trainscg'; 
+
+
+%Initilization Functions
+
+initFcn = 'initnw';
+
+
+% Choose Input and Output Pre/Post-Processing Functions
+
+% For a list of all processing functions type: help nnprocess
+
+net.input.processFcns = {'removeconstantrows','mapminmax'};
+
+net.output.processFcns = {'removeconstantrows','mapminmax'};
+
+
+% Setup Division of Data for Training, Validation, Testing
+
+% For a list of all data division functions type: help nndivide
+
+net.divideFcn = 'dividerand';  % Divide data randomly
+
+net.divideMode = 'sample';  % Divide up every sample
+
+net.divideParam.trainRatio = 0.60;
+
+net.divideParam.valRatio = 0.2;
+
+net.divideParam.testRatio = 0.2;
+
+
+
+% Choose a Performance Function
+
+net.performFcn = 'mse';  % Mean Squared Error
+
+
+
+% Choose Plot Functions
+
+% For a list of all plot functions type: help nnplot
+
+net.plotFcns = {'plotperform','plottrainstate','ploterrhist', ...
+
+    'plotregression', 'plotfit'};
+
+
+min_grad=net.trainParam.min_grad;
+
+
+%Network parameters
+
+%Maximum number of epochs to train	
+
+net.trainParam.epochs=2000;
+
+%Epochs between displays (NaN for no displays)	
+
+net.trainParam.show=1;
+
+%Performance goal	
+
+net.trainParam.goal=0.001;
+
+%Maximum time to train in seconds	
+
+net.trainParam.time=inf;
+
+%Minimum performance gradient	
+
+net.trainParam.min_grad=1.0E-0005;
+
+%Maximum validation failures	
+
+net.trainParam.max_fail=2000;
+
+%Determine change in weight for second derivative approximation	
+
+net.trainParam.sigma=5.00E-0005;
+
+%Parameter for regulating the indefiniteness of the Hessian	
+
+net.trainParam.lambda=5.00E-007;
+
+%Learning rate	
+
+net.trainParam.lr=0.01;
+
+% initialize the weights and the biases of the network
+
+net = init(net);
+
+net.iw{1,1}
+
+net.b{1}
+
+% Train the Network
+
+[net,tr] = train(net,x1,t);
+
+
+% Test the Network
+
+y = net(x1);
+
+e = gsubtract(t,y);
+
+performance = perform(net,t,y)
+
+% Stopping Criteria
+
+   if (performance <= 'net.trainParam.goal')
+
+    stop = 'Performance goal met.';
+
+     end
+
+   z = net(test1);
+
+  % Progress
+
+	if isfinite(goal) fprintf(', %s %g/%g',upper(net.performFcn),performance,goal); end
+
+		fprintf('\n')
+
+%	plotperf(tr,goal,this,epoch)
+
+    if length(stop) fprintf('%s, %s\n\n',stop); break; end
+
+    
+
+% Recalculate Training, Validation and Test Performance
+
+trainTargets = t .* tr.trainMask{1};
+
+valTargets = t .* tr.valMask{1};
+
+testTargets = t .* tr.testMask{1};
+
+trainPerformance = perform(net,trainTargets,y)
+
+valPerformance = perform(net,valTargets,y)
+
+testPerformance = perform(net,testTargets,y)
+
+
+
+%simulate the network with test set to determine the performance of the
+
+%network
+
+Simimulate = net(test);
+
+ 
+
+% View the Network
+
+view(net)
